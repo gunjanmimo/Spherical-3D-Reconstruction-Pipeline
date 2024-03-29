@@ -48,7 +48,7 @@ def image_format_handler(image_dir: str, extension: str, output_dir: str):
 
         else:
             warnings.warn(
-                f"SKIPPING: Invalid image format: {image_path.split(" / ")[-1]}"
+                f"SKIPPING: Invalid image format: {image_path.split(' / ')[-1]}"
             )
 
     print("\nImage format conversion summary")

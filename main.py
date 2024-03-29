@@ -1,7 +1,7 @@
 import os
 from glob import glob
-import argparse
-
+import yaml
+import subprocess
 
 # local imports
 from utils import (
@@ -9,6 +9,7 @@ from utils import (
     image_resolution_handler,
     image_orientation_handler,
     image_metadata_extractor,
+    image_3D_reconstruction_handler,
 )
 
 
@@ -54,6 +55,22 @@ def main(
     )
 
     # stage 5: 3D reconstruction
+    print("\nSTAGE 5: 3D Reconstruction")
+    print("=====================================")
+
+    # input_dir = os.path.join(output_dir, "images")
+    # output_dir = os.path.join(output_dir, "reconstruction")
+    # os.makedirs(output_dir, exist_ok=True)
+
+    # matches_dir = os.path.join(output_dir, "matches")
+    # os.makedirs(matches_dir, exist_ok=True)
+    camera_file_params = "./openMVG/src/openMVG/exif/sensor_width_database/sensor_width_camera_database.txt"
+
+    image_3D_reconstruction_handler(
+        data_dir=output_dir,
+        camera_file_params_path=camera_file_params,
+    )
+
     return
 
 
@@ -63,34 +80,23 @@ if __name__ == "__main__":
     print("Image Processing & 3D Reconstruction Pipeline")
     print("-----------------------------------")
 
-    # Parse arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=str, required=True, help="Image path")
-    parser.add_argument("--output", type=str, required=True, help="Output path")
-    parser.add_argument("--extension", type=str, help="Image extension", default="jpeg")
-    parser.add_argument(
-        "--max_width", type=int, help="Max width, default=average width", default=6000
-    )
-    parser.add_argument(
-        "--max_height",
-        type=int,
-        help="Max height, default=average height",
-        default=6000,
-    )
-    parser.add_argument(
-        "--orientation",
-        type=str,
-        help="Orientation",
-        default="landscape",
-    )
+    root_dir = "./data"
+    # load yaml file
+    with open(os.path.join(root_dir, "config.yaml"), "r") as file:
+        config = yaml.safe_load(file)
 
-    args = parser.parse_args()
+    img_dir = os.path.join(root_dir, "images")
+    output_dir = os.path.join(root_dir, "output")
+    extension = config.get("extension", "jpeg")
+    max_width = config.get("max_width", None)
+    max_height = config.get("max_height", None)
+    orientation = config.get("orientation", "landscape")
 
     main(
-        img_dir=args.input,
-        output_dir=args.output,
-        extension=args.extension,
-        max_width=args.max_width,
-        max_height=args.max_height,
-        orientation=args.orientation,
+        img_dir=img_dir,
+        output_dir=output_dir,
+        extension=extension,
+        max_width=max_width,
+        max_height=max_height,
+        orientation=orientation,
     )
