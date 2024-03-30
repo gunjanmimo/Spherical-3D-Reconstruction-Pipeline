@@ -9,7 +9,8 @@ from utils import (
     image_resolution_handler,
     image_orientation_handler,
     image_metadata_extractor,
-    image_3D_reconstruction_handler,
+    aliceVision_preprocessing_handler,
+    colmap_3D_reconstruction_handler,
 )
 
 
@@ -20,6 +21,7 @@ def main(
     max_width: int,
     max_height: int,
     orientation: str,
+    aliceVision_number_of_splits: int,
 ):
 
     # stage 1: collect image meta data
@@ -55,20 +57,20 @@ def main(
     )
 
     # stage 5: 3D reconstruction
-    print("\nSTAGE 5: 3D Reconstruction")
+    print("\nSTAGE 5: AliceVision 360 DEGREE IMAGE PREPROCESSING")
     print("=====================================")
+    aliceVision_preprocessing_handler(
+        img_dir=os.path.join(output_dir, "images"),
+        output_dir=os.path.join(output_dir, "output_split"),
+        number_of_splits=aliceVision_number_of_splits,
+    )
 
-    # input_dir = os.path.join(output_dir, "images")
-    # output_dir = os.path.join(output_dir, "reconstruction")
-    # os.makedirs(output_dir, exist_ok=True)
-
-    # matches_dir = os.path.join(output_dir, "matches")
-    # os.makedirs(matches_dir, exist_ok=True)
-    camera_file_params = "./openMVG/src/openMVG/exif/sensor_width_database/sensor_width_camera_database.txt"
-
-    image_3D_reconstruction_handler(
-        data_dir=output_dir,
-        camera_file_params_path=camera_file_params,
+    # stage 6: 3D reconstruction using COLMAP
+    print("\nSTAGE 6: COLMAP 3D RECONSTRUCTION")
+    print("=====================================")
+    colmap_3D_reconstruction_handler(
+        image_dir=os.path.join(output_dir, "output_split", "final_images"),
+        output_dir=output_dir,
     )
 
     return
@@ -80,7 +82,7 @@ if __name__ == "__main__":
     print("Image Processing & 3D Reconstruction Pipeline")
     print("-----------------------------------")
 
-    root_dir = "./data"
+    root_dir = "data"
     # load yaml file
     with open(os.path.join(root_dir, "config.yaml"), "r") as file:
         config = yaml.safe_load(file)
@@ -91,6 +93,7 @@ if __name__ == "__main__":
     max_width = config.get("max_width", None)
     max_height = config.get("max_height", None)
     orientation = config.get("orientation", "landscape")
+    aliceVision_number_of_splits = config.get("aliceVision_number_of_splits", 8)
 
     main(
         img_dir=img_dir,
@@ -99,4 +102,5 @@ if __name__ == "__main__":
         max_width=max_width,
         max_height=max_height,
         orientation=orientation,
+        aliceVision_number_of_splits=aliceVision_number_of_splits,
     )
