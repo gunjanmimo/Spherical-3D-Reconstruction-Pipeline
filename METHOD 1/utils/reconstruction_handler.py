@@ -61,6 +61,8 @@ def image_3D_reconstruction_handler(
             matches_dir + "/sfm_data.json",
             "-o",
             matches_dir + "/matches.putative.bin",
+            "p",
+            matches_dir + "/pairs.bin",
             "-f",
             "1",
             "-n",
@@ -117,18 +119,22 @@ def image_3D_reconstruction_handler(
     pRecons.wait()
 
     print("7. Structure from Known Poses (robust triangulation)")
-    pRecons = subprocess.Popen(
+    pStructure = subprocess.Popen(
         [
             "openMVG_main_ComputeStructureFromKnownPoses",
             "-i",
-            reconstruction_dir + "/sfm_data.bin",
+            matches_dir + "/sfm_data.json",
             "-m",
             matches_dir,
+            "-f",
+            matches_dir + "/matches.f.bin",
+            "-b",
+            "1",
             "-o",
-            os.path.join(reconstruction_dir, "robust.ply"),
+            os.path.join(reconstruction_dir, "robust.bin"),
         ]
     )
-    pRecons.wait()
+    pStructure.wait()
 
     print(f"Reconstruction completed. Output saved in {reconstruction_dir}")
 
