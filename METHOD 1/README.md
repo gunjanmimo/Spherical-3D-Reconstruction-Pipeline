@@ -1,4 +1,4 @@
-# Floorfy-BCN-TEST
+# METHOD 1
 
 
 
@@ -13,3 +13,17 @@
         ├── image_2.jpeg
         └── image_N.jpeg
 ```
+
+### Config 
+
+**extension**: File extension (Default= .jpeg)
+
+**max_width**: Max width (Default=average of width)
+
+**max_height**: Max heigh (Default=average of height)
+
+**orientation**: Image orientation (Default=landscape)
+
+**describer_method**: Keypoint detection method (Default=AKAZE)
+
+**describer_preset**: Used to control the number of detected keypoint (Default=ULTRA)

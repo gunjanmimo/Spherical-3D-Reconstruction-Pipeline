@@ -2,6 +2,7 @@ import os
 from glob import glob
 import yaml
 import subprocess
+import time
 
 # local imports
 from utils import (
@@ -57,6 +58,7 @@ def main(
     )
 
     # stage 5: 3D reconstruction
+    start_time = time.time()
     print("\nSTAGE 5: AliceVision 360 DEGREE IMAGE PREPROCESSING")
     print("=====================================")
     aliceVision_preprocessing_handler(
@@ -72,6 +74,12 @@ def main(
         image_dir=os.path.join(output_dir, "output_split", "final_images"),
         output_dir=output_dir,
     )
+
+    end_time = time.time()
+
+    print("\n-----------------------------------")
+    print("Total time taken: ", end_time - start_time)
+    print("-----------------------------------")
 
     return
 

@@ -2,6 +2,7 @@ import os
 from glob import glob
 import yaml
 import subprocess
+import time
 
 # local imports
 from utils import (
@@ -59,6 +60,7 @@ def main(
     )
 
     # stage 5: 3D reconstruction
+    start_time = time.time()
     print("\nSTAGE 5: 3D Reconstruction")
     print("=====================================")
     camera_file_params = "./openMVG/src/openMVG/exif/sensor_width_database/sensor_width_camera_database.txt"
@@ -67,7 +69,11 @@ def main(
         data_dir=output_dir,
         camera_file_params_path=camera_file_params,
     )
+    end_time = time.time()
 
+    print("\n-----------------------------------")
+    print("Total time taken: ", end_time - start_time)
+    print("-----------------------------------")
     return
 
 
