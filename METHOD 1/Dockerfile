@@ -1,3 +1,4 @@
+# FROM nvidia/cuda:12.3.1-base-ubuntu22.04
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -12,12 +13,6 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-
-COPY . /app
-RUN pip3 install --upgrade pip
-
-# INSTALL PYTHON DEPENDENCIES
-RUN --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements.txt
 
 # OPENMVG INSTALLATION
 RUN apt-get update && apt-get install -y \
@@ -75,20 +70,24 @@ RUN git clone https://ceres-solver.googlesource.com/ceres-solver ceres-solver \
     && make -j10 && make install \
     && cd .. && rm -rf ceres_build ceres-solver
 
-# OpenMVS installation
-# RUN git clone https://github.com/cdcseacave/openMVS.git openMVS 
-# RUN mkdir openMVS_build && cd openMVS_build 
-# RUN cmake ../openMVS -DCMAKE_BUILD_TYPE=Release -DVCG_ROOT="../vcglib" 
-# RUN make install -j10 
-# RUN cd .. && rm -rf openMVS_build openMVS
 
 RUN git clone https://github.com/cdcseacave/openMVS.git openMVS
 RUN mkdir openMVS_build
 WORKDIR /app/openMVS_build
-RUN cmake ../openMVS -DCMAKE_BUILD_TYPE=Release -DVCG_ROOT="../vcglib"
+# RUN cmake ../openMVS -DCMAKE_BUILD_TYPE=Release -DVCG_ROOT="../vcglib"
+RUN cmake ../openMVS -DCMAKE_BUILD_TYPE=Release -DVCG_ROOT="../vcglib" -DCMAKE_INSTALL_PREFIX=/app/OpenMVS
 RUN make install -j10
 WORKDIR /app
 RUN rm -rf openMVS_build openMVS
+
+
+
+# RUN PIPELINE 
+COPY . /app
+RUN pip3 install --upgrade pip
+
+# INSTALL PYTHON DEPENDENCIES
+RUN --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements.txt
 
 
 # # RUN PYTHON SCRIPT

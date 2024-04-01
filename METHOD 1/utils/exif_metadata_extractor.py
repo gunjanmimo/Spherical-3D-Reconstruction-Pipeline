@@ -62,10 +62,10 @@ def read_image_exif(image_path):
 
                 return exif_info
             else:
-                warnings.warn(f"{image_path.split('/')[-1]}: Found no EXIF data.")
+                # warnings.warn(f"{image_path.split('/')[-1]}: Found no EXIF data.")
                 return {}
     except Exception as e:
-        warnings.warn(f"{image_path.split('/')[-1]}: Found no EXIF data.")
+        # warnings.warn(f"{image_path.split('/')[-1]}: Found no EXIF data.")
         return {}
 
 

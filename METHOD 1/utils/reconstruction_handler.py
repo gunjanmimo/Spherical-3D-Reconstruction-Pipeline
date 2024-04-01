@@ -6,9 +6,12 @@ def image_3D_reconstruction_handler(
     data_dir: str, camera_file_params_path: str
 ) -> bool:
 
-    input_dir = os.path.join(data_dir, "images")
-    output_dir = os.path.join(data_dir, "reconstruction")
-    os.makedirs(data_dir, exist_ok=True)
+    image_dir = os.path.join(data_dir, "images")
+    if not os.path.exists(image_dir):
+        assert False, f"Image directory {image_dir} does not exist"
+
+    # reconstruction_dir = os.path.join(data_dir, "reconstruction")
+    # os.makedirs(reconstruction_dir, exist_ok=True)
 
     matches_dir = os.path.join(data_dir, "matches")
     os.makedirs(matches_dir, exist_ok=True)
@@ -18,7 +21,7 @@ def image_3D_reconstruction_handler(
         [
             "openMVG_main_SfMInit_ImageListing",
             "-i",
-            input_dir,
+            image_dir,
             "-o",
             matches_dir,
             "-d",
@@ -42,13 +45,13 @@ def image_3D_reconstruction_handler(
             "-o",
             matches_dir,
             "-m",
-            "SIFT",
+            "AKAZE_FLOAT",
             "-f",
             "1",
             "-p",
             "ULTRA",
             "-n",
-            "10",
+            "16",
         ]
     )
     pFeatures.wait()
@@ -87,7 +90,7 @@ def image_3D_reconstruction_handler(
     )
     pFiltering.wait()
 
-    reconstruction_dir = os.path.join(output_dir, "reconstruction_sequential")
+    reconstruction_dir = os.path.join(data_dir, "reconstruction_sequential")
     print(
         "5. Do Incremental/Sequential reconstruction"
     )  # set manually the initial pair to avoid the prompt question
@@ -136,6 +139,45 @@ def image_3D_reconstruction_handler(
     )
     pStructure.wait()
 
-    print(f"Reconstruction completed. Output saved in {reconstruction_dir}")
+    # DENSE RECONSTRUCTION
+
+    print("8. Export to cubic scene for OpenMVS")
+    subprocess.run(
+        [
+            "openMVG_main_openMVGSpherical2Cubic",
+            "-i",
+            reconstruction_dir + "/sfm_data.bin",
+            "-o",
+            reconstruction_dir + "/cubic",
+        ]
+    )
+
+    print("9. Convert to OpenMVS format")
+    subprocess.run(
+        [
+            "openMVG_main_openMVG2openMVS",
+            "-i",
+            reconstruction_dir + "/cubic/sfm_data_perspective.bin",
+            "-o",
+            reconstruction_dir + "/cubic/scene.mvs",
+            "-d",
+            reconstruction_dir + "/cubic/openmvs_images",
+        ]
+    )
+
+    print("10. Densify point cloud")
+
+    # change working directory to /cubic
+    os.chdir(reconstruction_dir + "/cubic")
+    subprocess.run(
+        [
+            "/app/OpenMVS/bin/OpenMVS/DensifyPointCloud",
+            "scene.mvs",
+        ]
+    )
+
+    print(
+        f"Reconstruction and Dense Reconstruction completed. Output saved in {reconstruction_dir}"
+    )
 
     return True

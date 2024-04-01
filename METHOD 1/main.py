@@ -22,6 +22,10 @@ def main(
     orientation: str,
 ):
 
+    # delete output directory if it exists
+    if os.path.exists(output_dir):
+        subprocess.run(["rm", "-rf", output_dir])
+
     # stage 1: collect image meta data
     print("\nSTAGE 1: Collecting image metadata")
     print("=====================================")
@@ -57,13 +61,6 @@ def main(
     # stage 5: 3D reconstruction
     print("\nSTAGE 5: 3D Reconstruction")
     print("=====================================")
-
-    # input_dir = os.path.join(output_dir, "images")
-    # output_dir = os.path.join(output_dir, "reconstruction")
-    # os.makedirs(output_dir, exist_ok=True)
-
-    # matches_dir = os.path.join(output_dir, "matches")
-    # os.makedirs(matches_dir, exist_ok=True)
     camera_file_params = "./openMVG/src/openMVG/exif/sensor_width_database/sensor_width_camera_database.txt"
 
     image_3D_reconstruction_handler(
