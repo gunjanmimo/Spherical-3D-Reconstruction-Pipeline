@@ -90,8 +90,8 @@ RUN pip3 install --upgrade pip
 RUN --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements.txt
 
 
-# # RUN PYTHON SCRIPT
-# CMD ["python3", "main.py"]
+# RUN PYTHON SCRIPT
+CMD ["python3", "main.py"]
 
 
 
