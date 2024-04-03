@@ -1,4 +1,4 @@
-# BACKEND ENGINEER ASSIGNMENT | FLOORFY 
+# Spherical 3D Reconstruction Pipeline
 
 
 
